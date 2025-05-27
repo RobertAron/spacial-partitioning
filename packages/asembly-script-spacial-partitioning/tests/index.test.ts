@@ -1,5 +1,5 @@
 import { createNearbyGraph } from "../build/debug.js";
-import { test } from "bun:test";
+import { expect, test } from "bun:test";
 
 // test("2 + 2", () => {
 // 	expect(add(2, 2)).toBe(4);
@@ -17,5 +17,18 @@ test("thing", () => {
     ]),
 		2,
 	);
-	console.log({ result });
+	const output: { from: number; to: number }[] = [];
+	for (let i = 0; i < result.length; i += 2) {
+		output.push({ from: result[i], to: result[i + 1] });
+	}
+	// expect(output).toEqual([
+	// 	{
+	// 		from: 0,
+	// 		to: 1,
+	// 	},
+	// 	{
+	// 		from: 2,
+	// 		to: 3,
+	// 	},
+	// ]);
 });

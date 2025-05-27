@@ -12,22 +12,23 @@ class Vec3 {
 	}
 }
 
-class NodePairDistance {
+class NodePair {
 	from: u32;
 	to: u32;
-	distance: f64;
-	constructor(id: u32, to: u32, distance: f64) {
+	constructor(id: u32, to: u32) {
 		this.from = id;
 		this.to = to;
-		this.distance = distance;
 	}
 	toString(): string {
-		return `{from:${this.from},to:${this.to},distance:${this.distance}}`;
+		return `{from:${this.from},to:${this.to}}`;
 	}
 }
 
+@inline
 const bucketValue = (value: number, floorTo: number): number =>
 	floor(value / floorTo);
+
+@inline
 function vec3ToVecBucket(vec3: Vec3, bucket: number): Vec3 {
 	const x = bucketValue(vec3.x, bucket);
 	const y = bucketValue(vec3.y, bucket);
@@ -42,8 +43,8 @@ function vec3ToVecBucket(vec3: Vec3, bucket: number): Vec3 {
  */
 export function createNearbyGraph(
 	vecTuples: Float32Array,
-	distance: number,
-): void {
+	distance: f32,
+): Uint32Array {
 	const vecs = new Array<Vec3>(vecTuples.length / 3);
 	for (let i = 0; i < vecTuples.length; i += 3) {
 		vecs[i / 3] = new Vec3(vecTuples[i], vecTuples[i + 1], vecTuples[i + 2]);
@@ -59,8 +60,8 @@ export function createNearbyGraph(
 			bucket.push(i);
 		}
 	}
-
-	const nearbyLookup = new Array<NodePairDistance>();
+	
+	const nearbyLookup = new Array<NodePair>();
 	const completedCalculations = new Set<string>();
 	const bucketedVecValues = bucketedVecIndexes.values();
 	for (let i = 0; i < bucketedVecValues.length; ++i) {
@@ -108,17 +109,18 @@ export function createNearbyGraph(
 						(otherVector.z - currentVector.z) ** 2,
 				);
 				if (distanceBetweenPoints < distance) {
-					const idDistance = new NodePairDistance(
-						firstVectorIndex,
-						otherVectorIndex,
-						distanceBetweenPoints,
-					);
+					const idDistance = new NodePair(firstVectorIndex, otherVectorIndex);
 					nearbyLookup.push(idDistance);
 				}
 			}
 		}
 	}
-	for (let i = 0; i < nearbyLookup.length; ++i) {
-		console.log(nearbyLookup[i].toString());
+	const result = new Uint32Array(nearbyLookup.length * 2);
+	for (let i = 0; i < nearbyLookup.length; i++) {
+		const pair = nearbyLookup[i];
+		result[i * 2] = pair.from;
+		result[i * 2 + 1] = pair.to;
 	}
+	return result;
+	// return new Uint32Array(0)
 }
