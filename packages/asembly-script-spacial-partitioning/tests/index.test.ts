@@ -20,16 +20,7 @@ test("thing", () => {
 	for (let i = 0; i < result.length; i += 2) {
 		output.push({ from: result[i], to: result[i + 1] });
 	}
-	// expect(output).toEqual([
-	// 	{
-	// 		from: 0,
-	// 		to: 1,
-	// 	},
-	// 	{
-	// 		from: 2,
-	// 		to: 3,
-	// 	},
-	// ]);
+	expect(output).toMatchSnapshot();
 });
 
 const input2 = new Float32Array([
@@ -237,5 +228,10 @@ const input2 = new Float32Array([
 ]);
 
 test("test2", () => {
-	createNearbyGraph(input2, 5);
+	const result = createNearbyGraph(input2, 5);
+	const output: { from: number; to: number }[] = [];
+	for (let i = 0; i < result.length; i += 2) {
+		output.push({ from: result[i], to: result[i + 1] });
+	}
+	expect(output).toMatchSnapshot();
 });
