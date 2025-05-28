@@ -221,7 +221,7 @@ function createNearbyGraphAssembly(
 		const fish = allFish[i];
 		fish.threeObj.position.toArray(inputParam, i * 3);
 	}
-	console.log(inputParam);
+	// console.log(inputParam);
 	const rawResult = createNearbyGraphAssemblyRaw(inputParam, distance);
 	const nearbyMapping: { from: number; to: number }[] = [];
 	for (let i = 0; i < rawResult.length; i += 2) {

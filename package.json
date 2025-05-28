@@ -1,5 +1,8 @@
 {
   "name": "my-project",
   "version": "1.0.0",
-  "workspaces": ["packages/*"]
+  "workspaces": ["packages/*"],
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4"
+  }
 }
