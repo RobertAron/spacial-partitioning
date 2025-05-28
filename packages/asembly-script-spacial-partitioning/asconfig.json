@@ -9,11 +9,12 @@
     "release": {
       "outFile": "build/release.wasm",
       "textFile": "build/release.wat",
+      "optimize": true,
       "sourceMap": true,
       "optimizeLevel": 3,
       "shrinkLevel": 0,
-      "converge": false,
-      "noAssert": false
+      "converge": true,
+      "noAssert": true
     }
   },
   "options": {

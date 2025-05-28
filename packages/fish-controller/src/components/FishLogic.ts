@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { createNearbyGraph as createNearbyGraphAssemblyRaw } from "asembly-script-spacial-partitioning";
-
 type Fish = {
 	color: string;
 	velocity: THREE.Vector3;
@@ -223,14 +222,12 @@ function createNearbyGraphAssembly(
 	}
 	// console.log(inputParam);
 	const rawResult = createNearbyGraphAssemblyRaw(inputParam, distance);
-	const nearbyMapping: { from: number; to: number }[] = [];
-	for (let i = 0; i < rawResult.length; i += 2) {
-		nearbyMapping.push({ from: rawResult[i], to: rawResult[i + 1] });
-	}
 	const result = new Array(allFish.length).fill(null).map((): number[] => []);
-	for (const output of nearbyMapping) {
-		result[output.from].push(output.to);
-		result[output.to].push(output.from);
+	for (let i = 0; i < rawResult.length; i += 2) {
+		const from = rawResult[i];
+		const to = rawResult[i + 1];
+		result[from].push(to);
+		result[to].push(from);
 	}
 	return result;
 }

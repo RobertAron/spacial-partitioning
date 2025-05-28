@@ -59,7 +59,7 @@ export function createNearbyGraph(
 	distance: f32,
 ): Array<u32> {
 	const vecArray = new Vec3Array(vecTuples);
-	const squaredDistance = distance ** 2;
+	const squaredDistance = Mathf.pow(distance, 2);
 	const itemCount = floor(vecTuples.length / 3) as u32;
 	const bucketedVecIndexes = new Map<u64, u32[]>();
 	for (let i = 0 as u32; i < itemCount; ++i) {
@@ -71,10 +71,10 @@ export function createNearbyGraph(
 			bucket.push(i);
 		}
 	}
-	const nearbyLookup = new Array<u32>();
 	const bucketedVecKeys = bucketedVecIndexes.keys();
 	const idsNearishBucket = new StaticArray<u32>(itemCount);
 	const nearishBucketMemStart = changetype<usize>(idsNearishBucket);
+	const nearbyLookup = new Array<u32>();
 	for (
 		let bucketKeyIndex = 0;
 		bucketKeyIndex < bucketedVecKeys.length;
@@ -123,9 +123,9 @@ export function createNearbyGraph(
 				const otherVectorY = vecArray.getY(otherVectorIndex);
 				const otherVectorZ = vecArray.getZ(otherVectorIndex);
 				const squaredDistanceBetweenPoints =
-					(otherVectorX - currentVectorX) ** 2 +
-					(otherVectorY - currentVectorY) ** 2 +
-					(otherVectorZ - currentVectorZ) ** 2;
+					Mathf.pow(otherVectorX - currentVectorX, 2) +
+					Mathf.pow(otherVectorY - currentVectorY, 2) +
+					Mathf.pow(otherVectorZ - currentVectorZ, 2);
 				if (squaredDistanceBetweenPoints < squaredDistance) {
 					nearbyLookup.push(firstVectorIndex);
 					nearbyLookup.push(otherVectorIndex);
