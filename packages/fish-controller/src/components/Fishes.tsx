@@ -1,16 +1,14 @@
 import * as THREE from "three";
 import React, { useRef, useMemo, useEffect } from "react";
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
-import { createNearbyGraph as assemblyCreateNearbyGraph} from "asembly-script-spacial-partitioning";
-
 import { Mesh } from "three";
-
 import {
 	alignmentForces,
 	applySeparationForces,
 	cohesionForces,
 	createFishSquare,
 	createNearbyGraph,
+	createNearbyGraphAssembly,
 	outerBoundsReturn,
 } from "./FishLogic";
 import { OBJLoader } from "three/examples/jsm/Addons.js";
@@ -29,17 +27,6 @@ type BoxesProps = {
 	cohesionForceScaling: number;
 	separationForceScaling: number;
 };
-console.log("HI")
-	const result = assemblyCreateNearbyGraph(
-		// biome-ignore format: tuples
-		new Float32Array([
-      1, 4, 10,
-      1, 4, 11,
-      1, 4, 49,
-      1, 4, 50.5
-    ]),
-		2,
-	);
 
 function FishesComponent({
 	boxSize,
@@ -86,7 +73,8 @@ function FishesComponent({
 		// If you tab out, then back in this number could be large.
 		// don't render as if more than .5 seconds has passed in this scenario.
 		const cappedDelta = Math.min(delta, 0.5);
-		const nearbyGraph = createNearbyGraph(fishes, 5);
+		// const nearbyGraph = createNearbyGraph(fishes, 5);
+		const nearbyGraph = createNearbyGraphAssembly(fishes,5)
 		for (let fishIndex = 0; fishIndex < fishes.length; fishIndex++) {
 			const fish = fishes[fishIndex];
 			// Calculate force

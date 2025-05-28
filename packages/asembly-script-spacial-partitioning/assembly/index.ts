@@ -1,126 +1,137 @@
-class Vec3 {
-	x: number;
-	y: number;
-	z: number;
-	constructor(x: number, y: number, z: number) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+class Vec3Array {
+	constructor(public data: StaticArray<f32>) {
+		this.ptr = changetype<usize>(data);
 	}
-	toString(): string {
-		return `${this.x.toString()}:${this.y.toString()}:${this.z.toString()}`;
-	}
-}
 
-class NodePair {
-	from: u32;
-	to: u32;
-	constructor(id: u32, to: u32) {
-		this.from = id;
-		this.to = to;
+	private ptr: usize;
+
+	@inline getX(index: u32): f32 {
+		return load<f32>(this.ptr + <usize>index * 12);
 	}
-	toString(): string {
-		return `{from:${this.from},to:${this.to}}`;
+
+	@inline getY(index: u32): f32 {
+		return load<f32>(this.ptr + <usize>index * 12 + 4);
+	}
+
+	@inline getZ(index: u32): f32 {
+		return load<f32>(this.ptr + <usize>index * 12 + 8);
 	}
 }
 
-@inline
-const bucketValue = (value: number, floorTo: number): number =>
-	floor(value / floorTo);
+const bucketValue = (value: f32, floorTo: f32): i32 =>
+	floor(value / floorTo) as i32;
 
-@inline
-function vec3ToVecBucket(vec3: Vec3, bucket: number): Vec3 {
-	const x = bucketValue(vec3.x, bucket);
-	const y = bucketValue(vec3.y, bucket);
-	const z = bucketValue(vec3.z, bucket);
-	return new Vec3(x, y, z);
+const bias = 1 << 20; // 1048576
+function packXYZBits(x: i32, y: i32, z: i32): i64 {
+	// Check that each value fits in 21 bits signed
+	// const max = 1048575;
+	// const min = -1048576;
+	// if (x < min || x > max || y < min || y > max || z < min || z > max) {
+	//   throw new Error("Bucket index out of 21-bit range");
+	// }
+	// Pack into a single 64-bit int: [21 bits x][21 bits y][21 bits z]
+	const xInt = (x + bias) & 0x1fffff;
+	const yInt = (y + bias) & 0x1fffff;
+	const zInt = (z + bias) & 0x1fffff;
+	return ((xInt as i64) << 42) | ((yInt as i64) << 21) | (zInt as i64);
 }
 
+function itemsToBucketKey(
+	vecTuples: Vec3Array,
+	offset: u32,
+	floorTo: f32,
+): u64 {
+	const vecX = vecTuples.getX(offset);
+	const vecY = vecTuples.getY(offset);
+	const vecZ = vecTuples.getZ(offset);
+	const bucketX = bucketValue(vecX, floorTo);
+	const bucketY = bucketValue(vecY, floorTo);
+	const bucketZ = bucketValue(vecZ, floorTo);
+	return packXYZBits(bucketX, bucketY, bucketZ);
+}
 /**
  *
- * @param vecTuples Float32Array of vec3 positions (flattened)
+ * @param vecTuples
  * @param distance
  */
 export function createNearbyGraph(
-	vecTuples: Float32Array,
+	vecTuples: StaticArray<f32>,
 	distance: f32,
-): Uint32Array {
-	const vecs = new Array<Vec3>(vecTuples.length / 3);
-	for (let i = 0; i < vecTuples.length; i += 3) {
-		vecs[i / 3] = new Vec3(vecTuples[i], vecTuples[i + 1], vecTuples[i + 2]);
-	}
-	const bucketedVecIndexes = new Map<string, u32[]>();
-	for (let i = 0; i < vecs.length; ++i) {
-		const vec = vecs[i];
-		const bucketKey = vec3ToVecBucket(vec, distance).toString();
-		if (!bucketedVecIndexes.has(bucketKey))
-			bucketedVecIndexes.set(bucketKey, [i]);
+): Array<u32> {
+	const vecArray = new Vec3Array(vecTuples);
+	const squaredDistance = Mathf.pow(distance, 2);
+	const itemCount = floor(vecTuples.length / 3) as u32;
+	const bucketedVecIndexes = new Map<u64, u32[]>();
+	for (let i = 0 as u32; i < itemCount; ++i) {
+		const bucketId = itemsToBucketKey(vecArray, i, distance);
+		if (!bucketedVecIndexes.has(bucketId))
+			bucketedVecIndexes.set(bucketId, [i]);
 		else {
-			const bucket = bucketedVecIndexes.get(bucketKey);
+			const bucket = bucketedVecIndexes.get(bucketId);
 			bucket.push(i);
 		}
 	}
-	
-	const nearbyLookup = new Array<NodePair>();
-	const completedCalculations = new Set<string>();
-	const bucketedVecValues = bucketedVecIndexes.values();
-	for (let i = 0; i < bucketedVecValues.length; ++i) {
-		const vectorIndexes = bucketedVecValues[i];
-		const sampleVec = vecs[vectorIndexes[0]];
-		const bucketIndexes = vec3ToVecBucket(sampleVec, distance);
-		let nearishVectorIndexes = new Array<u32>();
-		for (let x = bucketIndexes.x - 1; x <= bucketIndexes.x + 1; x++) {
-			for (let y = bucketIndexes.y - 1; y <= bucketIndexes.y + 1; y++) {
-				for (let z = bucketIndexes.z - 1; z <= bucketIndexes.z + 1; z++) {
-					const nearbyBucketKey = new Vec3(x, y, z).toString();
-					const thingsInNearbyBucket = bucketedVecIndexes.has(nearbyBucketKey);
+	const bucketedVecKeys = bucketedVecIndexes.keys();
+	const idsNearishBucket = new StaticArray<u32>(itemCount);
+	const nearishBucketMemStart = changetype<usize>(idsNearishBucket);
+	const nearbyLookup = new Array<u32>();
+	for (
+		let bucketKeyIndex = 0;
+		bucketKeyIndex < bucketedVecKeys.length;
+		++bucketKeyIndex
+	) {
+		let nearishCount = 0;
+		const itemsInBucket = bucketedVecIndexes.get(
+			bucketedVecKeys[bucketKeyIndex],
+		);
+		const sampleItemIndex = itemsInBucket[0];
+		const vecX = vecArray.getX(sampleItemIndex);
+		const vecY = vecArray.getY(sampleItemIndex);
+		const vecZ = vecArray.getZ(sampleItemIndex);
+		const bucketX = bucketValue(vecX, distance);
+		const bucketY = bucketValue(vecY, distance);
+		const bucketZ = bucketValue(vecZ, distance);
+		for (let x = bucketX - 1; x <= bucketX + 1; x++) {
+			for (let y = bucketY - 1; y <= bucketY + 1; y++) {
+				for (let z = bucketZ - 1; z <= bucketZ + 1; z++) {
+					const bucketKey = packXYZBits(x, y, z);
+					const thingsInNearbyBucket = bucketedVecIndexes.has(bucketKey);
 					if (thingsInNearbyBucket) {
-						const hmm = nearishVectorIndexes.concat(
-							bucketedVecIndexes.get(nearbyBucketKey),
+						const items = bucketedVecIndexes.get(bucketKey);
+						memory.copy(
+							nearishBucketMemStart + nearishCount * sizeof<u32>(),
+							items.dataStart,
+							items.length * sizeof<u32>(),
 						);
-						nearishVectorIndexes = hmm;
+						nearishCount += items.length;
 					}
 				}
 			}
 		}
 		// Go through all the nearish indexes and do the actual calculation
-		for (let i = 0; i < nearishVectorIndexes.length; i++) {
-			const firstVectorIndex = nearishVectorIndexes[i];
-			const currentVector = vecs[nearishVectorIndexes[i]];
-			for (let j = 0; j < nearishVectorIndexes.length; j++) {
+		for (let i = 0; i < itemsInBucket.length; i++) {
+			const firstVectorIndex = itemsInBucket[i];
+			const currentVectorX = vecArray.getX(firstVectorIndex);
+			const currentVectorY = vecArray.getY(firstVectorIndex);
+			const currentVectorZ = vecArray.getZ(firstVectorIndex);
+			for (let j = 0; j < nearishCount; j++) {
+				const otherVectorIndex = idsNearishBucket[j];
 				// can't be near yourself
-				if (i === j) continue;
-				const otherVectorIndex = nearishVectorIndexes[j];
-				const otherVector = vecs[nearishVectorIndexes[j]];
-				const low =
-					firstVectorIndex < otherVectorIndex
-						? firstVectorIndex
-						: otherVectorIndex;
-				const high =
-					firstVectorIndex > otherVectorIndex
-						? firstVectorIndex
-						: otherVectorIndex;
-				const workId = `${low}:${high}`;
-				if (completedCalculations.has(workId)) continue;
-				completedCalculations.add(workId);
-				const distanceBetweenPoints = Math.sqrt(
-					(otherVector.x - currentVector.x) ** 2 +
-						(otherVector.y - currentVector.y) ** 2 +
-						(otherVector.z - currentVector.z) ** 2,
-				);
-				if (distanceBetweenPoints < distance) {
-					const idDistance = new NodePair(firstVectorIndex, otherVectorIndex);
-					nearbyLookup.push(idDistance);
+				// mappings are bi-directional so we can cut work in half by taking advantage of the symmetry here
+				if (firstVectorIndex >= otherVectorIndex) continue;
+				const otherVectorX = vecArray.getX(otherVectorIndex);
+				const otherVectorY = vecArray.getY(otherVectorIndex);
+				const otherVectorZ = vecArray.getZ(otherVectorIndex);
+				const squaredDistanceBetweenPoints =
+					Mathf.pow(otherVectorX - currentVectorX, 2) +
+					Mathf.pow(otherVectorY - currentVectorY, 2) +
+					Mathf.pow(otherVectorZ - currentVectorZ, 2);
+				if (squaredDistanceBetweenPoints < squaredDistance) {
+					nearbyLookup.push(firstVectorIndex);
+					nearbyLookup.push(otherVectorIndex);
 				}
 			}
 		}
 	}
-	const result = new Uint32Array(nearbyLookup.length * 2);
-	for (let i = 0; i < nearbyLookup.length; i++) {
-		const pair = nearbyLookup[i];
-		result[i * 2] = pair.from;
-		result[i * 2 + 1] = pair.to;
-	}
-	return result;
-	// return new Uint32Array(0)
+	return nearbyLookup;
 }
