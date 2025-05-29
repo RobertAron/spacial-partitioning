@@ -49,6 +49,8 @@ function itemsToBucketKey(
 	const bucketZ = bucketValue(vecZ, floorTo);
 	return packXYZBits(bucketX, bucketY, bucketZ);
 }
+
+const nearbyLookup = new StaticArray<u32>(160_000);
 /**
  *
  * @param vecTuples
@@ -58,6 +60,7 @@ export function createNearbyGraph(
 	vecTuples: StaticArray<f32>,
 	distance: f32,
 ): Array<u32> {
+	let nearbyLookupSize = 0;
 	const vecArray = new Vec3Array(vecTuples);
 	const squaredDistance = Mathf.pow(distance, 2);
 	const itemCount = floor(vecTuples.length / 3) as u32;
@@ -74,7 +77,6 @@ export function createNearbyGraph(
 	const bucketedVecKeys = bucketedVecIndexes.keys();
 	const idsNearishBucket = new StaticArray<u32>(itemCount);
 	const nearishBucketMemStart = changetype<usize>(idsNearishBucket);
-	const nearbyLookup = new Array<u32>();
 	for (
 		let bucketKeyIndex = 0;
 		bucketKeyIndex < bucketedVecKeys.length;
@@ -127,11 +129,11 @@ export function createNearbyGraph(
 					Mathf.pow(otherVectorY - currentVectorY, 2) +
 					Mathf.pow(otherVectorZ - currentVectorZ, 2);
 				if (squaredDistanceBetweenPoints < squaredDistance) {
-					nearbyLookup.push(firstVectorIndex);
-					nearbyLookup.push(otherVectorIndex);
+					nearbyLookup[nearbyLookupSize++] = firstVectorIndex;
+					nearbyLookup[nearbyLookupSize++] = otherVectorIndex;
 				}
 			}
 		}
 	}
-	return nearbyLookup;
+	return nearbyLookup.slice(0, nearbyLookupSize);
 }
