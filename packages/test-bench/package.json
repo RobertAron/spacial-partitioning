@@ -1,0 +1,21 @@
+{
+  "name": "test-bench",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "mitata": "^1.0.34"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "rust-spacial-partitioning": "workspace:*",
+    "asembly-script-spacial-partitioning": "workspace:*"
+  },
+  "scripts": {
+    "benchmark":"bun ./benchmarks/index.bench.ts",
+    "test": "bun test --watch"
+  }
+}

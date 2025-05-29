@@ -8,7 +8,8 @@ import {
 	cohesionForces,
 	createFishSquare,
 	createNearbyGraph,
-	createNearbyGraphAssembly,
+	createNearbyGraphAssemblyScript,
+	createNearbyGraphRust,
 	outerBoundsReturn,
 } from "./FishLogic";
 import { OBJLoader } from "three/examples/jsm/Addons.js";
@@ -74,7 +75,8 @@ function FishesComponent({
 		// don't render as if more than .5 seconds has passed in this scenario.
 		const cappedDelta = Math.min(delta, 0.5);
 		// const nearbyGraph = createNearbyGraph(fishes, 5);
-		const nearbyGraph = createNearbyGraphAssembly(fishes,5)
+		// const nearbyGraph = createNearbyGraphAssemblyScript(fishes,5)
+		const nearbyGraph = createNearbyGraphRust(fishes,5)
 		for (let fishIndex = 0; fishIndex < fishes.length; fishIndex++) {
 			const fish = fishes[fishIndex];
 			// Calculate force

@@ -16,6 +16,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "three": "^0.176.0",
+    "rust-spacial-partitioning":"workspace:*",
     "asembly-script-spacial-partitioning":"workspace:*"
   },
   "devDependencies": {

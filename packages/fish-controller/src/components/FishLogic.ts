@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { createNearbyGraph as createNearbyGraphAssemblyRaw } from "asembly-script-spacial-partitioning";
+import init, { create_nearby_graph } from "rust-spacial-partitioning";
 type Fish = {
 	color: string;
 	velocity: THREE.Vector3;
@@ -211,7 +212,7 @@ function createNearbyGraph(allFish: Fish[], distance: number) {
 	return nearbyLookup;
 }
 
-function createNearbyGraphAssembly(
+function createNearbyGraphAssemblyScript(
 	allFish: Fish[],
 	distance: number,
 ): number[][] {
@@ -232,6 +233,32 @@ function createNearbyGraphAssembly(
 	return result;
 }
 
+let loaded = false;
+init().then(() => {
+	loaded = true;
+});
+
+function createNearbyGraphRust(allFish: Fish[], distance: number): number[][] {
+	if (loaded === false) {
+		console.warn("not ready...");
+		return new Array(allFish.length).fill([]);
+	}
+	const inputParam = new Float32Array(allFish.length * 3);
+	for (let i = 0; i < allFish.length; i++) {
+		const fish = allFish[i];
+		fish.threeObj.position.toArray(inputParam, i * 3);
+	}
+	const rawResult = create_nearby_graph(inputParam, distance);
+	const result = new Array(allFish.length).fill(null).map((): number[] => []);
+	for (let i = 0; i < rawResult.length; i += 2) {
+		const from = rawResult[i];
+		const to = rawResult[i + 1];
+		result[from].push(to);
+		result[to].push(from);
+	}
+	return result;
+}
+
 export {
 	createFishSquare,
 	outerBoundsReturn,
@@ -239,5 +266,6 @@ export {
 	cohesionForces,
 	applySeparationForces,
 	createNearbyGraph,
-	createNearbyGraphAssembly,
+	createNearbyGraphAssemblyScript,
+	createNearbyGraphRust,
 };

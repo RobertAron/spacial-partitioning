@@ -1,0 +1,7 @@
+{
+	"name": "rust-spacial-builder",
+	"scripts": {
+		"build": "wasm-pack build --target web --out-dir ../rust_spacial_partitioning_dist --out-name rust_spacial_partitioning",
+		"build:watch": "nodemon --watch src -e rs --exec \"bun run build\""
+	}
+}

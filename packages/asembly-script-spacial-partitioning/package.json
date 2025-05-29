@@ -6,7 +6,6 @@
   "devDependencies": {
     "@types/bun": "latest",
     "assemblyscript": "^0.27.36",
-    "mitata": "^1.0.34",
     "nodemon": "^3.1.10"
   },
   "peerDependencies": {
@@ -23,7 +22,6 @@
     "asbuild:release": "asc assembly/index.ts --target release",
     "asbuild": "npm run asbuild:debug && npm run asbuild:release",
     "asbuild:watch": "nodemon --watch assembly --ext ts --exec \"bun run asbuild\"",
-    "test": "bun test --watch",
     "start": "npx serve ."
   }
 }
