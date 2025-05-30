@@ -56,17 +56,17 @@ function FishesComponent({
 	);
 	const instancedMeshRef = useRef<THREE.InstancedMesh | null>(null);
 	// Apply colors
-	useEffect(() => {
-		if (instancedMeshRef.current == null) return;
-		for (let i = 0; i < fishes.length; i++) {
-			instancedMeshRef.current.setColorAt(
-				i,
-				tempColor.set(fishes[i].color).clone(),
-			);
-		}
-		if (instancedMeshRef.current.instanceColor == null) return;
-		instancedMeshRef.current.instanceColor.needsUpdate = true;
-	}, [fishes]);
+	// useEffect(() => {
+	// 	if (instancedMeshRef.current == null) return;
+	// 	for (let i = 0; i < fishes.length; i++) {
+	// 		instancedMeshRef.current.setColorAt(
+	// 			i,
+	// 			tempColor.set(fishes[i].color).clone(),
+	// 		);
+	// 	}
+	// 	if (instancedMeshRef.current.instanceColor == null) return;
+	// 	instancedMeshRef.current.instanceColor.needsUpdate = true;
+	// }, [fishes]);
 	// Run movement.
 	useFrame(function frameLoop(_, delta) {
 		if (instancedMeshRef.current === null) return;
@@ -76,7 +76,7 @@ function FishesComponent({
 		const cappedDelta = Math.min(delta, 0.5);
 		// const nearbyGraph = createNearbyGraph(fishes, 5);
 		// const nearbyGraph = createNearbyGraphAssemblyScript(fishes,5)
-		const nearbyGraph = createNearbyGraphRust(fishes,5)
+		const nearbyGraph = createNearbyGraphRust(fishes, 5);
 		for (let fishIndex = 0; fishIndex < fishes.length; fishIndex++) {
 			const fish = fishes[fishIndex];
 			// Calculate force
@@ -115,16 +115,26 @@ function FishesComponent({
 		instancedMeshRef.current.count = fishes.length;
 		instancedMeshRef.current.instanceMatrix.needsUpdate = true;
 	});
+	const mat = useMemo(
+		() =>
+			new THREE.MeshStandardMaterial({
+				vertexColors: true,
+				roughness: 0.5,
+				metalness: 0.2,
+			}),
+		[],
+	);
 
 	if (geometry === undefined) return null;
 	return (
 		<instancedMesh
 			ref={instancedMeshRef}
 			args={[undefined, undefined, ABSOLUTE_MAX_INSTANCE_COUNT]}
+			material={mat}
 		>
 			<primitive object={geometry}>
 				<instancedBufferAttribute
-					attach="attributesColor"
+					attach="attributes-color"
 					args={[colorArray, 3]}
 				/>
 			</primitive>
@@ -133,4 +143,4 @@ function FishesComponent({
 }
 
 export { FishesComponent };
-export default FishesComponent
+export default FishesComponent;

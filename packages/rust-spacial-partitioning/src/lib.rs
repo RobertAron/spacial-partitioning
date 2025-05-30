@@ -1,5 +1,6 @@
-use std::collections::HashMap;
+use rustc_hash::FxHashMap;
 use wasm_bindgen::prelude::*;
+use smallvec::SmallVec;
 
 fn pack_xyz_bits(x: i32, y: i32, z: i32) -> u64 {
     let bias = 1 << 20;
@@ -22,7 +23,7 @@ pub fn create_nearby_graph(vec_tuples: &[f32], distance: f32) -> Vec<u32> {
     let squared_distance = distance * distance;
     let mut nearby_lookup = Vec::new();
 
-    let mut bucketed_vec_indexes: HashMap<u64, Vec<usize>> = HashMap::new();
+    let mut bucketed_vec_indexes: FxHashMap<u64, Vec<usize>> = FxHashMap::default();
 
     for i in 0..item_count {
         let [x, y, z] = points[i];
@@ -34,8 +35,8 @@ pub fn create_nearby_graph(vec_tuples: &[f32], distance: f32) -> Vec<u32> {
         bucketed_vec_indexes.entry(bucket_id).or_default().push(i);
     }
 
-    let mut nearish_bucket: Vec<usize> = Vec::with_capacity(1_000);
-    for (&key, items_in_bucket) in bucketed_vec_indexes.iter() {
+    let mut nearish_bucket: SmallVec<[usize; 64]> = SmallVec::new();
+    for (&_key, items_in_bucket) in bucketed_vec_indexes.iter() {
         nearish_bucket.clear();
         let sample_index = items_in_bucket[0];
         let [x, y, z] = points[sample_index];
@@ -48,7 +49,7 @@ pub fn create_nearby_graph(vec_tuples: &[f32], distance: f32) -> Vec<u32> {
                 for dz in -1..=1 {
                     let neighbor_key = pack_xyz_bits(bx + dx, by + dy, bz + dz);
                     if let Some(neighbors) = bucketed_vec_indexes.get(&neighbor_key) {
-                        nearish_bucket.extend(neighbors);
+                        nearish_bucket.extend(neighbors.iter().copied());
                     }
                 }
             }

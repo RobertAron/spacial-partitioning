@@ -6,7 +6,6 @@ import { OrbitControls, Stats } from "@react-three/drei";
 import { SimpleSlider } from "@/components/SimpleSlider";
 import dynamic from "next/dynamic";
 
-
 const FishesComponent = dynamic(() => import("@/components/Fishes"), {
 	ssr: false,
 });
@@ -18,8 +17,8 @@ const outerBoundsDistance = 100;
 export default function Page() {
 	const [boxSize, setBoxSize] = useState(3);
 	const [outerBoundsForceScaling, setOuterBoundsForceScaling] = useState(1);
-	const [alignmentForeScaling, setAlignmentForeScaling] = useState(6);
-	const [cohesionForceScaling, setCohesionForceScaling] = useState(0.8);
+	const [alignmentForeScaling, setAlignmentForeScaling] = useState(4);
+	const [cohesionForceScaling, setCohesionForceScaling] = useState(0.7);
 	const [separationForceScaling, setSeparationForceScaling] = useState(0.1);
 
 	return (
@@ -87,7 +86,7 @@ export default function Page() {
 				style={{ width: "unset", flexGrow: 1 }}
 				// linear
 			>
-				<OrbitControls autoRotate />
+				<OrbitControls />
 				<color attach="background" args={[BACKGROUND_COLOR]} />
 				<Stats showPanel={0} className="stats" />
 				<mesh>
@@ -106,9 +105,19 @@ export default function Page() {
 					cohesionForceScaling={cohesionForceScaling}
 					separationForceScaling={separationForceScaling}
 				/>
-				<pointLight position={[0, 100, 100]} intensity={0.8} color="#C5DCE0" />
-				<pointLight position={[0, 100, -100]} intensity={0.1} color="#FE7558" />
-				<ambientLight intensity={0.1} />
+				<directionalLight
+					position={[50, 100, 50]}
+					intensity={1.2}
+					castShadow
+					color="#fffbe6"
+				/>
+				<pointLight position={[0, 50, 100]} intensity={0.5} color="#C5DCE0" />
+				<pointLight position={[0, 50, -100]} intensity={0.3} color="#FE7558" />
+				<hemisphereLight
+					groundColor="#444767"
+					intensity={1}
+				/>
+				<ambientLight intensity={1} />
 			</Canvas>
 		</div>
 	);
