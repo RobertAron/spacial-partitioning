@@ -1,5 +1,5 @@
 {
-  "name": "asembly-script-spacial-partitioning",
+  "name": "assemblyscript-spacial-partitioning",
   "module": "index.ts",
   "type": "module",
   "private": true,

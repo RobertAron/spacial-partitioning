@@ -17,7 +17,7 @@
     "react-dom": "^19.0.0",
     "three": "^0.176.0",
     "rust-spacial-partitioning":"workspace:*",
-    "asembly-script-spacial-partitioning":"workspace:*"
+    "assemblyscript-spacial-partitioning":"workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

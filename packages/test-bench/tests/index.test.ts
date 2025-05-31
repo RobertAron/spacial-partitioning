@@ -1,4 +1,4 @@
-import { createNearbyGraph as createNearbyGraphAssembly } from "asembly-script-spacial-partitioning";
+import { createNearbyGraph as createNearbyGraphAssembly } from "assemblyscript-spacial-partitioning";
 import init, { create_nearby_graph } from "rust-spacial-partitioning";
 import { describe, expect, test } from "bun:test";
 import { input1, input2, input3 } from "../inputs";

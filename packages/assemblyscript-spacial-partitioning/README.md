@@ -1,4 +1,4 @@
-# asembly-script-spacial-partitioning
+# assemblyscript-spacial-partitioning
 
 To install dependencies:
 

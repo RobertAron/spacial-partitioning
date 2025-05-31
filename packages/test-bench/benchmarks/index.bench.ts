@@ -1,5 +1,5 @@
 import { run, bench, summary } from "mitata";
-import { createNearbyGraph } from "asembly-script-spacial-partitioning";
+import { createNearbyGraph } from "assemblyscript-spacial-partitioning";
 import init, { create_nearby_graph } from "rust-spacial-partitioning";
 import { input3 } from "../inputs.js";
 

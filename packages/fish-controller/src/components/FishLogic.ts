@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { createNearbyGraph as createNearbyGraphAssemblyRaw } from "asembly-script-spacial-partitioning";
+import { createNearbyGraph as createNearbyGraphAssemblyRaw } from "assemblyscript-spacial-partitioning";
 import init, { create_nearby_graph } from "rust-spacial-partitioning";
 type Fish = {
 	color: string;
