@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stats } from "@react-three/drei";
-// import { FishesComponent } from "./Fishes";
 import { SimpleSlider } from "@/components/SimpleSlider";
 import dynamic from "next/dynamic";
 

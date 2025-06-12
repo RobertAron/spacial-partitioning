@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "rust-spacial-partitioning": "workspace:*",
-    "assemblyscript-spacial-partitioning": "workspace:*"
+    "assemblyscript-spacial-partitioning": "workspace:*",
+    "typescript-spacial-partitioning": "workspace:*"
   },
   "scripts": {
     "benchmark":"bun ./benchmarks/index.bench.ts",

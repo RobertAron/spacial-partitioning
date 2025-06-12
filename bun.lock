@@ -44,7 +44,7 @@
     "packages/rust-spacial-partitioning": {
       "name": "rust-spacial-builder",
     },
-    "packages/rust_spacial_partitioning_dist": {
+    "packages/rust-spacial-partitioning-dist": {
       "name": "rust-spacial-partitioning",
       "version": "0.1.0",
     },
@@ -53,10 +53,24 @@
       "dependencies": {
         "assemblyscript-spacial-partitioning": "workspace:*",
         "rust-spacial-partitioning": "workspace:*",
+        "typescript-spacial-partitioning": "workspace:*",
       },
       "devDependencies": {
         "@types/bun": "latest",
         "mitata": "^1.0.34",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/typescript-spacial-partitioning": {
+      "name": "typescript-spacial-partitioning",
+      "dependencies": {
+        "nodemon": "^3.1.10",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "typescript": "^5",
       },
       "peerDependencies": {
         "typescript": "^5",
@@ -420,7 +434,7 @@
 
     "rust-spacial-builder": ["rust-spacial-builder@workspace:packages/rust-spacial-partitioning"],
 
-    "rust-spacial-partitioning": ["rust-spacial-partitioning@workspace:packages/rust_spacial_partitioning_dist"],
+    "rust-spacial-partitioning": ["rust-spacial-partitioning@workspace:packages/rust-spacial-partitioning-dist"],
 
     "scheduler": ["scheduler@0.25.0", "", {}, "sha512-xFVuu11jh+xcO7JOAGJNOXld8/TcEHK/4CituBUeUb5hqxJLj9YuemAEuvm9gQ/+pgXYfbQuqAkiYu+u7YEsNA=="],
 
@@ -479,6 +493,8 @@
     "tunnel-rat": ["tunnel-rat@0.1.2", "", { "dependencies": { "zustand": "^4.3.2" } }, "sha512-lR5VHmkPhzdhrM092lI2nACsLO4QubF0/yoOhzX7c+wIpbN1GjHNzCc91QlpxBi+cnx8vVJ+Ur6vL5cEoQPFpQ=="],
 
     "typescript": ["typescript@5.8.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ=="],
+
+    "typescript-spacial-partitioning": ["typescript-spacial-partitioning@workspace:packages/typescript-spacial-partitioning"],
 
     "undefsafe": ["undefsafe@2.0.5", "", {}, "sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA=="],
 

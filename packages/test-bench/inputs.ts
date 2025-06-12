@@ -1,5 +1,5 @@
 export const input1 = new Float32Array([
-	1, 4, 10, 1, 4, 11, 1, 4, 49, 1, 4, 50.5,
+	1, 4, 10, 1, 4, 11, 1, 4, 49, 1, 4, 50.5
 ]);
 
 export const input2 = new Float32Array([
