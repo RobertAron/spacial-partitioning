@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { createNearbyGraph as createNearbyGraphAssemblyRaw } from "assemblyscript-spacial-partitioning";
-import init, { create_nearby_graph } from "rust-spacial-partitioning";
+import { create_nearby_graph } from "rust-spacial-partitioning";
+import { createNearbyGraph as createNearbyGraphTypescriptRaw } from "typescript-spacial-partitioning";
 type Fish = {
 	color: string;
 	velocity: THREE.Vector3;
@@ -138,117 +139,21 @@ function applySeparationForces(
 	inVec.add(tempSeparationSum);
 }
 
-/**
-Fast create nearby graph
- */
-// function createNearbyGraph(allFish:Fish[], distance = 5){
-//   const nearbyGraph: boolean[][] = new Array(allFish.length).fill(null).map(()=> new Array(allFish.length).fill(false));
-//   for(let i=0;i<allFish.length;i++){
-//     for(let j=0;j<i;j++){
-//       const fish1 = allFish[i]
-//       const fish2 = allFish[j]
-//       if(fish1.threeObj.position.distanceTo(fish2.threeObj.position)<distance) nearbyGraph[i][j] = true
-//     }
-//   }
-//   return nearbyGraph
-// }
-
-const bucketValue = (value: number, floorTo: number) =>
-	Math.floor(value / floorTo);
-
-/**
-Use Spacial Partitioning to find which fish are near each other
- */
-function createNearbyGraph(allFish: Fish[], distance: number) {
-	// Maps are slightly faster for iterating through all members
-	const bucketedFish = new Map<string, number[]>();
-	// Put all fish into their buckets
-	for (let i = 0; i < allFish.length; i++) {
-		const fish = allFish[i];
-		const group = fish.threeObj.position
-			.toArray()
-			.map((positionComponent) => bucketValue(positionComponent, distance))
-			.join(":");
-		if (!bucketedFish.has(group)) bucketedFish.set(group, [i]);
-		else bucketedFish.get(group)?.push(i);
-	}
-
-	// this is the end goal. return a 2d array. 1st index is the fish id which returns a list of fish(index) that are nearby
-	const nearbyLookup: number[][] = Array.from(Array(allFish.length), () => []);
-
-	for (const fishInCurrentBucket of bucketedFish.values()) {
-		// Make a list of all fish within this bucket, and adjacent buckets
-		const fishesIndexWithinAdjacentBuckets: number[] = [];
-		const bucketIndexes = allFish[fishInCurrentBucket[0]].threeObj.position
-			.toArray()
-			.map((component) => bucketValue(component, distance));
-		for (let x = bucketIndexes[0] - 1; x <= bucketIndexes[0] + 1; x++) {
-			for (let y = bucketIndexes[1] - 1; y <= bucketIndexes[1] + 1; y++) {
-				for (let z = bucketIndexes[2] - 1; z <= bucketIndexes[2] + 1; z++) {
-					const bucketKey = `${x}:${y}:${z}`;
-					const bucketValues = bucketedFish.get(bucketKey) ?? [];
-					fishesIndexWithinAdjacentBuckets.push(...bucketValues);
-				}
-			}
-		}
-
-		// For the current fish, go through all fish that are potentially nearby.
-		// If they are within the distance, add them to the list of nearby fish.
-		for (const currentFishIndex of fishInCurrentBucket) {
-			const currentFish = allFish[currentFishIndex];
-			for (const potentiallyNearbyFishIndex of fishesIndexWithinAdjacentBuckets) {
-				// can't be near yourself
-				if (currentFishIndex === potentiallyNearbyFishIndex) continue;
-				const otherFish = allFish[potentiallyNearbyFishIndex];
-				const isNearby =
-					currentFish.threeObj.position.distanceTo(
-						otherFish.threeObj.position,
-					) < distance;
-				if (isNearby)
-					nearbyLookup[currentFishIndex].push(potentiallyNearbyFishIndex);
-			}
-		}
-	}
-	return nearbyLookup;
-}
-
-function createNearbyGraphAssemblyScript(
+function createNearbyGraph(
 	allFish: Fish[],
 	distance: number,
-): number[][] {
+	mode: "rust" | "assemblyscript" | "typescript",
+) {
 	const inputParam = new Float32Array(allFish.length * 3);
 	for (let i = 0; i < allFish.length; i++) {
 		const fish = allFish[i];
 		fish.threeObj.position.toArray(inputParam, i * 3);
 	}
-	// console.log(inputParam);
-	const rawResult = createNearbyGraphAssemblyRaw(inputParam, distance);
-	const result = new Array(allFish.length).fill(null).map((): number[] => []);
-	for (let i = 0; i < rawResult.length; i += 2) {
-		const from = rawResult[i];
-		const to = rawResult[i + 1];
-		result[from].push(to);
-		result[to].push(from);
-	}
-	return result;
-}
-
-let loaded = false;
-init().then(() => {
-	loaded = true;
-});
-
-function createNearbyGraphRust(allFish: Fish[], distance: number): number[][] {
-	if (loaded === false) {
-		console.warn("not ready...");
-		return new Array(allFish.length).fill([]);
-	}
-	const inputParam = new Float32Array(allFish.length * 3);
-	for (let i = 0; i < allFish.length; i++) {
-		const fish = allFish[i];
-		fish.threeObj.position.toArray(inputParam, i * 3);
-	}
-	const rawResult = create_nearby_graph(inputParam, distance);
+	// biome-ignore format: ternary
+	const rawResult = 
+	  mode==='assemblyscript' ? createNearbyGraphAssemblyRaw(inputParam,distance) :
+	  mode==='rust'?create_nearby_graph(inputParam,distance) :
+	  createNearbyGraphTypescriptRaw(inputParam,distance)
 	const result = new Array(allFish.length).fill(null).map((): number[] => []);
 	for (let i = 0; i < rawResult.length; i += 2) {
 		const from = rawResult[i];
@@ -265,7 +170,5 @@ export {
 	alignmentForces,
 	cohesionForces,
 	applySeparationForces,
-	createNearbyGraph,
-	createNearbyGraphAssemblyScript,
-	createNearbyGraphRust,
+	createNearbyGraph
 };

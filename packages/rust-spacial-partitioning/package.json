@@ -1,7 +1,7 @@
 {
   "name": "rust-spacial-builder",
   "scripts": {
-    "build": "wasm-pack build --target web --out-dir ../rust-spacial-partitioning-dist --out-name rust_spacial_partitioning && wasm-opt -Oz -o ../rust-spacial-partitioning-dist/rust_spacial_partitioning_bg.wasm ../rust-spacial-partitioning-dist/rust_spacial_partitioning_bg.wasm",
+    "build": "wasm-pack build --out-dir ../rust-spacial-partitioning-dist --out-name rust_spacial_partitioning && wasm-opt -Oz -o ../rust-spacial-partitioning-dist/rust_spacial_partitioning_bg.wasm ../rust-spacial-partitioning-dist/rust_spacial_partitioning_bg.wasm",
     "build:watch": "nodemon --watch src -e rs --exec \"bun run build\""
   }
 }

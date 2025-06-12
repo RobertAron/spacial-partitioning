@@ -13,12 +13,17 @@ const BACKGROUND_COLOR = "#444767";
 const EDGE_VISUAL_COLOR = "#40F0FA";
 const outerBoundsDistance = 100;
 
+type Modes = "rust" | "assemblyscript" | "typescript";
 export default function Page() {
 	const [boxSize, setBoxSize] = useState(3);
 	const [outerBoundsForceScaling, setOuterBoundsForceScaling] = useState(1);
 	const [alignmentForeScaling, setAlignmentForeScaling] = useState(4);
 	const [cohesionForceScaling, setCohesionForceScaling] = useState(0.7);
 	const [separationForceScaling, setSeparationForceScaling] = useState(0.1);
+	const [mode, setMode] = useState<"rust" | "assemblyscript" | "typescript">(
+		"rust",
+	);
+	console.log(mode)
 
 	return (
 		<div
@@ -75,6 +80,12 @@ export default function Page() {
 					value={separationForceScaling}
 					onChange={setSeparationForceScaling}
 				/>
+				<label htmlFor="mode">Partitioning Mode:</label>
+				<select id="mode" value={mode} onChange={(e) => setMode(e.target.value as Modes)}>
+					<option value="typescript">Typescript</option>
+					<option value="assemblyscript">Assembly Script (WASM)</option>
+					<option value="rust">Rust (WASM)</option>
+				</select>
 			</div>
 			<Canvas
 				camera={{
@@ -103,6 +114,7 @@ export default function Page() {
 					alignmentForeScaling={alignmentForeScaling}
 					cohesionForceScaling={cohesionForceScaling}
 					separationForceScaling={separationForceScaling}
+					mode={mode}
 				/>
 				<directionalLight
 					position={[50, 100, 50]}
@@ -112,10 +124,7 @@ export default function Page() {
 				/>
 				<pointLight position={[0, 50, 100]} intensity={0.5} color="#C5DCE0" />
 				<pointLight position={[0, 50, -100]} intensity={0.3} color="#FE7558" />
-				<hemisphereLight
-					groundColor="#444767"
-					intensity={1}
-				/>
+				<hemisphereLight groundColor="#444767" intensity={1} />
 				<ambientLight intensity={1} />
 			</Canvas>
 		</div>
