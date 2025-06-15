@@ -2,11 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
 	webpack: (config, { webpack }) => {
-		config.experiments = {
-			...config.experiments,
-			topLevelAwait: true,
-			asyncWebAssembly: true,
-		};
+		// config.experiments = {
+		// 	...config.experiments,
+		// 	topLevelAwait: true,
+		// 	asyncWebAssembly: true,
+		// };
 		config.externals["node:fs"] = "commonjs node:fs";
 		config.resolve.fallback = {
 			...config.resolve.fallback,
@@ -19,7 +19,7 @@ const nextConfig: NextConfig = {
 		);
 
 		return config;
-	},
+	}
 };
 
 export default nextConfig;

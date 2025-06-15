@@ -23,7 +23,6 @@ export default function Page() {
 	const [mode, setMode] = useState<"rust" | "assemblyscript" | "typescript">(
 		"rust",
 	);
-	console.log(mode)
 
 	return (
 		<div

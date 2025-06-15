@@ -55,18 +55,6 @@ function FishesComponent({
     [fishes]
   );
   const instancedMeshRef = useRef<THREE.InstancedMesh | null>(null);
-  // Apply colors
-  // useEffect(() => {
-  // 	if (instancedMeshRef.current == null) return;
-  // 	for (let i = 0; i < fishes.length; i++) {
-  // 		instancedMeshRef.current.setColorAt(
-  // 			i,
-  // 			tempColor.set(fishes[i].color).clone(),
-  // 		);
-  // 	}
-  // 	if (instancedMeshRef.current.instanceColor == null) return;
-  // 	instancedMeshRef.current.instanceColor.needsUpdate = true;
-  // }, [fishes]);
   // Run movement.
   useFrame(function frameLoop(_, delta) {
     if (instancedMeshRef.current === null) return;

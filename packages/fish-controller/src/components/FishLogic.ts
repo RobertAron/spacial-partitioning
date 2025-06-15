@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import { createNearbyGraph as createNearbyGraphAssemblyRaw } from "assemblyscript-spacial-partitioning";
-import { create_nearby_graph } from "rust-spacial-partitioning";
+import * as spacial_rust from "rust-spacial-partitioning";
 import { createNearbyGraph as createNearbyGraphTypescriptRaw } from "typescript-spacial-partitioning";
+
+await  spacial_rust.default();
 type Fish = {
 	color: string;
 	velocity: THREE.Vector3;
@@ -152,7 +154,7 @@ function createNearbyGraph(
 	// biome-ignore format: ternary
 	const rawResult = 
 	  mode==='assemblyscript' ? createNearbyGraphAssemblyRaw(inputParam,distance) :
-	  mode==='rust'?create_nearby_graph(inputParam,distance) :
+	  mode==='rust'?spacial_rust.create_nearby_graph(inputParam,distance) :
 	  createNearbyGraphTypescriptRaw(inputParam,distance)
 	const result = new Array(allFish.length).fill(null).map((): number[] => []);
 	for (let i = 0; i < rawResult.length; i += 2) {
@@ -170,5 +172,5 @@ export {
 	alignmentForces,
 	cohesionForces,
 	applySeparationForces,
-	createNearbyGraph
+	createNearbyGraph,
 };
