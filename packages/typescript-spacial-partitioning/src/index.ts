@@ -79,7 +79,6 @@ export function createNearbyGraph(
 			for (const j of nearishItemIndexes) {
 				// can't be near yourself
 				if (i >= j) continue;
-
 				const { x: xj, y: yj, z: zj } = allPoints[j];
 				const distanceSquared =
 					(xi - xj) ** 2 + (yi - yj) ** 2 + (zi - zj) ** 2;
