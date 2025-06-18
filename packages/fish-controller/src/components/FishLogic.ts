@@ -3,7 +3,7 @@ import { createNearbyGraph as createNearbyGraphAssemblyRaw } from "assemblyscrip
 import * as spacial_rust from "rust-spacial-partitioning";
 import { createNearbyGraph as createNearbyGraphTypescriptRaw } from "typescript-spacial-partitioning";
 
-await  spacial_rust.default();
+await spacial_rust.default();
 type Fish = {
 	color: string;
 	velocity: THREE.Vector3;
