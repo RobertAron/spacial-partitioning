@@ -1,8 +1,13 @@
 {
   "name": "my-project",
   "version": "1.0.0",
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*",
+    "!packages/rust-spacial-partitioning-dist"
+  ],
   "devDependencies": {
-    "@biomejs/biome": "1.9.4"
-  }
+    "@biomejs/biome": "1.9.4",
+    "turbo": "^2.5.4"
+  },
+  "packageManager": "bun@1.2.0"
 }
