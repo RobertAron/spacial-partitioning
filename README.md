@@ -16,7 +16,7 @@ npm install @robertaron/spacial-partitioning
 
 ## Example
 
-Implementation of boids using the exported package can be seen [here](https://www.vercel.com)
+Implementation of boids using the exported package can be seen [here](https://spacial-partitioning.vercel.app/)
 
 ## Usage
 
