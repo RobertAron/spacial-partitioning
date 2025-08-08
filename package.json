@@ -12,6 +12,8 @@
   "packageManager": "bun@1.2.0",
   "scripts": {
     "predeploy-www": "npx vercel build --prod",
-    "deploy-www": "npx vercel --prebuilt --prod"
+    "deploy-www": "npx vercel --prebuilt --prod",
+    "prepublish-package": "cd packages/rust-spacial-partitioning && bun run build && cd ../npm-package && bun run build",
+    "publish-package":"cd packages/npm-package npm publish --access public && npm publish"
   }
 }

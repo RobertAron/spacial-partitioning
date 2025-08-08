@@ -1,28 +1,29 @@
 {
   "name": "@robertaron/spacial-partitioning",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/types/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
     }
   },
   "files": [
     "dist/"
   ],
-  "private": false,
-  "peerDependencies": {
-    "typescript": "^5"
+  "peerDependencies": { 
+    "typescript": "^5" 
   },
   "devDependencies": {
     "vite": "^6.3.5",
     "vite-plugin-wasm": "^3.4.1"
   },
-  "scripts": {
-    "build": "vite build && tsc"
+  "scripts": { 
+    "build": "vite build && tsc" 
   }
 }
