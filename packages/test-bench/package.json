@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "assemblyscript-spacial-partitioning": "workspace:*",
-    "rust-spacial-partitioning": "workspace:*",
+    "@robertaron/spacial-partitioning": "workspace:*",
     "typescript-spacial-partitioning": "workspace:*",
     "vite-plugin-top-level-await": "^1.5.0",
     "vite-plugin-wasm": "^3.4.1"

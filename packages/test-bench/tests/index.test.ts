@@ -1,14 +1,20 @@
 import { createNearbyGraph as createNearbyGraphAssembly } from "assemblyscript-spacial-partitioning";
-import { create_nearby_graph } from "rust-spacial-partitioning";
+import {
+	init,
+	createNearByGraph as create_nearby_graph,
+} from "@robertaron/spacial-partitioning";
 import { createNearbyGraph as createNearbyGraphTypescript } from "typescript-spacial-partitioning";
 import { describe, expect, test } from "vitest";
 import { input1, input2, input3 } from "../inputs";
 
+await init();
 
 function convertResult(result: ArrayLike<number>) {
 	const output: { from: number; to: number }[] = [];
 	for (let i = 0; i < result.length; i += 2) {
-		output.push({ from: result[i], to: result[i + 1] });
+		const from = Math.min(result[i], result[i + 1]);
+		const to = Math.max(result[i], result[i + 1]);
+		output.push({ from, to });
 	}
 	return output.sort((a, b) => {
 		if (a.from !== b.from) return a.from - b.from;
@@ -45,7 +51,7 @@ describe("Assembly Script Tests", () => {
 describe("Rust Script Tests", () => {
 	test("Input 1", () => {
 		const result = create_nearby_graph(input1, 2);
-		expect(convertResult(result)).toEqual([
+		expect(convertResult(result.flat())).toEqual([
 			{
 				from: 0,
 				to: 1,
@@ -59,12 +65,12 @@ describe("Rust Script Tests", () => {
 
 	test("Input 2", () => {
 		const result = create_nearby_graph(input2, 5);
-		expect(convertResult(result).length).toBe(1231);
+		expect(convertResult(result.flat()).length).toBe(1231);
 	});
 
 	test("Input 3", () => {
 		const result = create_nearby_graph(input3, 5);
-		expect(convertResult(result).length).toBe(38877);
+		expect(convertResult(result.flat()).length).toBe(38877);
 	});
 });
 
