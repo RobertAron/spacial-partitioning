@@ -10,14 +10,17 @@ async function init() {
 }
 
 function createNearByGraph(vec_tuples: Float32Array, distance: number) {
-	const size = vec_tuples.length / 3;
 	const rawResult = rustLibrary.create_nearby_graph(vec_tuples, distance);
-	const result = new Array(size).fill(null).map((): number[] => []);
-	for (let i = 0; i < rawResult.length; i += 2) {
+	const result = new Array<{ from: number; to: number; distance: number }>();
+	for (let i = 0; i < rawResult.length; i += 3) {
 		const from = rawResult[i];
 		const to = rawResult[i + 1];
-		result[from].push(to);
-		result[to].push(from);
+		const distance = rawResult[i + 2];
+		result.push({
+			from,
+			to,
+			distance,
+		});
 	}
 	return result;
 }
