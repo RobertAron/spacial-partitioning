@@ -8,11 +8,11 @@
     "@biomejs/biome": "1.9.4",
     "turbo": "^2.5.4"
   },
-  "packageManager": "bun@1.2.0",
+  "packageManager": "bun@1.3.6",
   "scripts": {
     "predeploy-www": "npx vercel build --prod",
     "deploy-www": "npx vercel --prebuilt --prod",
     "prepublish-package": "cd packages/rust-spacial-partitioning && bun run build && cd ../npm-package && bun run build",
-    "publish-package":"cd packages/npm-package npm publish --access public && npm publish"
+    "publish-package": "cd packages/npm-package npm publish --access public && npm publish"
   }
 }

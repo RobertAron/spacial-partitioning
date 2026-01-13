@@ -14,7 +14,7 @@ fn bucket_value(value: f32, distance: f32) -> i32 {
 }
 
 #[wasm_bindgen]
-pub fn create_nearby_graph(vec_tuples: &[f32], distance: f32) -> Vec<u32> {
+pub fn create_nearby_graph(vec_tuples: &[f32], distance: f32) -> Vec<f32> {
     let points: Vec<[f32; 3]> = vec_tuples
         .chunks_exact(3)
         .map(|c| [c[0], c[1], c[2]])
@@ -67,8 +67,10 @@ pub fn create_nearby_graph(vec_tuples: &[f32], distance: f32) -> Vec<u32> {
                 let dz = zj - zi;
                 let dist_sq = dx * dx + dy * dy + dz * dz;
                 if dist_sq < squared_distance {
-                    nearby_lookup.push(i as u32);
-                    nearby_lookup.push(j as u32);
+                    let actual_distance = dist_sq.sqrt();
+                    nearby_lookup.push(i as f32);
+                    nearby_lookup.push(j as f32);
+                    nearby_lookup.push(actual_distance);
                 }
             }
         }

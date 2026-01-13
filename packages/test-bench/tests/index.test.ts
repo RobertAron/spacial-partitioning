@@ -10,11 +10,13 @@ import { input1, input2, input3 } from "../inputs";
 await init();
 
 function convertResult(result: ArrayLike<number>) {
-	const output: { from: number; to: number }[] = [];
-	for (let i = 0; i < result.length; i += 2) {
-		const from = Math.min(result[i], result[i + 1]);
-		const to = Math.max(result[i], result[i + 1]);
-		output.push({ from, to });
+	const output: { from: number; to: number; distance: number }[] = [];
+	for (let i = 0; i < result.length; i += 3) {
+		output.push({
+			from: result[i],
+			to: result[i + 1],
+			distance: result[i + 2],
+		});
 	}
 	return output.sort((a, b) => {
 		if (a.from !== b.from) return a.from - b.from;

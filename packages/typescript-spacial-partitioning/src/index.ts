@@ -52,7 +52,7 @@ export function createNearbyGraph(
 		else bucketedVecIndexes.get(packValue)?.push(i);
 	}
 
-	// this is the end goal. pairing of indexes of items near each other.
+	// this is the end goal. pairing of indexes of items near each other, with distances.
 	const nearbyLookup: number[] = [];
 	for (const pointsInCurrentBucket of bucketedVecIndexes.values()) {
 		// Make a list of all fish within this bucket, and adjacent buckets
@@ -83,7 +83,10 @@ export function createNearbyGraph(
 				const distanceSquared =
 					(xi - xj) ** 2 + (yi - yj) ** 2 + (zi - zj) ** 2;
 				const isNearby = distanceSquared < maxDistanceSquared;
-				if (isNearby) nearbyLookup.push(i, j);
+				if (isNearby) {
+					const actualDistance = Math.sqrt(distanceSquared);
+					nearbyLookup.push(i, j, actualDistance);
+				}
 			}
 		}
 	}

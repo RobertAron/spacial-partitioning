@@ -1,10 +1,11 @@
 import * as rustLibrary from "../../rust-spacial-partitioning-dist";
 
-let ready = false;
+let initOutput: rustLibrary.InitOutput | null = null;
 async function init() {
+	if (initOutput !== null) return initOutput;
 	return rustLibrary.default().then((res) => {
-		ready = true;
-		return res;
+		initOutput = res;
+		return initOutput;
 	});
 }
 
