@@ -152,14 +152,15 @@ function createNearbyGraph(
 		fish.threeObj.position.toArray(inputParam, i * 3);
 	}
 	// biome-ignore format: ternary
-	const rawResult = 
+	const rawResult =
 	  mode==='assemblyscript' ? createNearbyGraphAssemblyRaw(inputParam,distance) :
 	  mode==='rust'?spacial_rust.create_nearby_graph(inputParam,distance) :
 	  createNearbyGraphTypescriptRaw(inputParam,distance)
 	const result = new Array(allFish.length).fill(null).map((): number[] => []);
-	for (let i = 0; i < rawResult.length; i += 2) {
+	for (let i = 0; i < rawResult.length; i += 3) {
 		const from = rawResult[i];
 		const to = rawResult[i + 1];
+		// rawResult[i + 2] contains the distance, which we're not using in fish logic currently
 		result[from].push(to);
 		result[to].push(from);
 	}

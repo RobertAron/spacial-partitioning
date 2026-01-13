@@ -50,7 +50,7 @@ function itemsToBucketKey(
 	return packXYZBits(bucketX, bucketY, bucketZ);
 }
 
-const nearbyLookup = new StaticArray<u32>(160_000);
+const nearbyLookup = new StaticArray<f32>(240_000);
 /**
  *
  * @param vecTuples
@@ -59,7 +59,7 @@ const nearbyLookup = new StaticArray<u32>(160_000);
 export function createNearbyGraph(
 	vecTuples: StaticArray<f32>,
 	distance: f32,
-): Array<u32> {
+): Array<f32> {
 	let nearbyLookupSize = 0;
 	const vecArray = new Vec3Array(vecTuples);
 	const squaredDistance = Mathf.pow(distance, 2);
@@ -129,8 +129,10 @@ export function createNearbyGraph(
 					Mathf.pow(otherVectorY - currentVectorY, 2) +
 					Mathf.pow(otherVectorZ - currentVectorZ, 2);
 				if (squaredDistanceBetweenPoints < squaredDistance) {
-					nearbyLookup[nearbyLookupSize++] = firstVectorIndex;
-					nearbyLookup[nearbyLookupSize++] = otherVectorIndex;
+					const actualDistance = Mathf.sqrt(squaredDistanceBetweenPoints);
+					nearbyLookup[nearbyLookupSize++] = firstVectorIndex as f32;
+					nearbyLookup[nearbyLookupSize++] = otherVectorIndex as f32;
+					nearbyLookup[nearbyLookupSize++] = actualDistance;
 				}
 			}
 		}
