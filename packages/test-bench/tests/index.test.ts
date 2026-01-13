@@ -144,11 +144,6 @@ describe("Same Results", () => {
 		const resAssembly = convertResult(createNearbyGraphAssembly(input1, 2));
 		const resRust = orderResults(createNearbyGraphRust(input1, 2));
 		const resTypescript = convertResult(createNearbyGraphTypescript(input1, 2));
-		console.log({
-			resAssembly,
-			resRust,
-			resTypescript,
-		});
 		expect(resultsAreEqual(resAssembly, resRust)).toBe(true);
 		expect(resultsAreEqual(resAssembly, resTypescript)).toBe(true);
 	});
@@ -156,11 +151,6 @@ describe("Same Results", () => {
 		const resAssembly = convertResult(createNearbyGraphAssembly(input2, 2));
 		const resRust = orderResults(createNearbyGraphRust(input2, 2));
 		const resTypescript = convertResult(createNearbyGraphTypescript(input2, 2));
-		console.log({
-			resAssembly,
-			resRust,
-			resTypescript,
-		});
 		expect(resultsAreEqual(resAssembly, resRust)).toBe(true);
 		expect(resultsAreEqual(resAssembly, resTypescript)).toBe(true);
 	});
