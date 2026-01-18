@@ -24,8 +24,8 @@ Implementation of boids using the exported package can be seen [here](https://sp
 - `positions`: Flat array of 3D coordinates (x, y, z, x, y, z, ...).
 - `distance`: Maximum distance to consider two points as neighbors.
 
-**Output** 
-- `number[][]` that notates indexes of items that are within the provided distance.
+**Output**
+- `Array<{ from: number; to: number; distance: number }>` - an array of edges, where each edge contains the indices of two neighboring points and the distance between them.
 
 ```ts
 import { init, createNearByGraph } from "@robertaron/spacial-partitioning";
@@ -41,9 +41,8 @@ const positions = new Float32Array([
 const distance = 2
 const neighborGraph = createNearByGraph(positions, distance);
 // [
-//   [1],  
-//   [0,2],
-//   [1],
+//   { from: 0, to: 1, distance: 1.5 },
+//   { from: 1, to: 2, distance: 1.5 },
 // ]
 ```
 ---

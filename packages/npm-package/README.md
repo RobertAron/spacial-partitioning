@@ -34,7 +34,11 @@ const positions = new Float32Array([
   // ... more points
 ]);
 const neighborGraph = createNearByGraph(positions, 2);
-// neighborGraph is an array of arrays: neighborGraph[i] = [indices of neighbors of i]
+// neighborGraph is an array of edges:
+// [
+//   { from: 0, to: 1, distance: 1.0 },
+//   { from: 2, to: 3, distance: 1.0 },
+// ]
 ```
 
 ---
@@ -45,11 +49,11 @@ const neighborGraph = createNearByGraph(positions, 2);
 
 Initializes the WASM module. **Must be called before using `createNearByGraph`.**
 
-### `createNearByGraph(positions: Float32Array, distance: number): number[][]`
+### `createNearByGraph(positions: Float32Array, distance: number): Array<{ from: number; to: number; distance: number }>`
 
 - `positions`: Flat array of 3D coordinates (x, y, z, x, y, z, ...).
 - `distance`: Maximum distance to consider two points as neighbors.
-- Returns: An array of arrays, where each sub-array contains the indices of neighboring points.
+- Returns: An array of edges, where each edge contains `from` and `to` (indices of neighboring points) and `distance` (the distance between them).
 
 ---
 
