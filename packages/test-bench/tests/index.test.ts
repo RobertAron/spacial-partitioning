@@ -1,6 +1,7 @@
 import { createNearbyGraph as createNearbyGraphAssembly } from "assemblyscript-spacial-partitioning";
 import {
 	init,
+	createCrossNearbyGraph,
 	createNearByGraph as createNearbyGraphRust,
 } from "@robertaron/spacial-partitioning";
 import { createNearbyGraph as createNearbyGraphTypescript } from "typescript-spacial-partitioning";
@@ -28,6 +29,16 @@ function convertResult(result: ArrayLike<number>) {
 		});
 	}
 	return orderResults(output);
+}
+
+function orderCrossResults(
+	output: { target: number; source: number; distance: number }[],
+) {
+	return output.sort((a, b) => {
+		if (a.target !== b.target) return a.target - b.target;
+		if (a.source !== b.source) return a.source - b.source;
+		return a.distance - b.distance;
+	});
 }
 
 function resultsAreEqual(
@@ -97,6 +108,30 @@ describe("Rust Script Tests", () => {
 		const result = createNearbyGraphRust(input3, 5);
 		expect(result.length).toBe(38877);
 	});
+
+	test("Cross nearby graph", () => {
+		const targets = new Float32Array([0, 0, 0, 10, 0, 0]);
+		const sources = new Float32Array([0, 0, 0, 1, 0, 0, 10, 0, 0, 20, 0, 0]);
+
+		const result = orderCrossResults(createCrossNearbyGraph(targets, sources, 10));
+
+		expect(result).toEqual([
+			{ target: 0, source: 0, distance: 0 },
+			{ target: 0, source: 1, distance: 1 },
+			{ target: 1, source: 1, distance: 9 },
+			{ target: 1, source: 2, distance: 0 },
+		]);
+	});
+
+	test("Cross nearby graph returns no pairs when there are no sources", () => {
+		const targets = new Float32Array([0, 0, 0, 10, 0, 0]);
+		const sources = new Float32Array([]);
+
+		const result = createCrossNearbyGraph(targets, sources, 10);
+
+		expect(result).toEqual([]);
+	});
+
 });
 
 describe("TypeScript Tests", () => {

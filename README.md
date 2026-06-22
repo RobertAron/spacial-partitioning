@@ -28,7 +28,7 @@ Implementation of boids using the exported package can be seen [here](https://sp
 - `Array<{ from: number; to: number; distance: number }>` - an array of edges, where each edge contains the indices of two neighboring points and the distance between them.
 
 ```ts
-import { init, createNearByGraph } from "@robertaron/spacial-partitioning";
+import { init, createCrossNearbyGraph, createNearByGraph } from "@robertaron/spacial-partitioning";
 
 // Initialize the WASM module (required before using createNearByGraph)
 await init();
@@ -43,6 +43,23 @@ const neighborGraph = createNearByGraph(positions, distance);
 // [
 //   { from: 0, to: 1, distance: 1.5 },
 //   { from: 1, to: 2, distance: 1.5 },
+// ]
+
+const targetPositions = new Float32Array([
+  0, 0, 0,
+  10, 0, 0,
+]);
+const sourcePositions = new Float32Array([
+  0, 0, 0,
+  1, 0, 0,
+  10, 0, 0,
+]);
+const crossNeighborGraph = createCrossNearbyGraph(targetPositions, sourcePositions, 10);
+// [
+//   { target: 0, source: 0, distance: 0 },
+//   { target: 0, source: 1, distance: 1 },
+//   { target: 1, source: 1, distance: 9 },
+//   { target: 1, source: 2, distance: 0 },
 // ]
 ```
 ---

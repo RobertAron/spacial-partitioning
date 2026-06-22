@@ -22,7 +22,7 @@ npm install @robertaron/spacial-partitioning
 ## Usage
 
 ```js
-import { init, createNearByGraph } from "@robertaron/spacial-partitioning";
+import { init, createCrossNearbyGraph, createNearByGraph } from "@robertaron/spacial-partitioning";
 
 // Initialize the WASM module (required before using createNearByGraph)
 await init();
@@ -39,6 +39,23 @@ const neighborGraph = createNearByGraph(positions, 2);
 //   { from: 0, to: 1, distance: 1.0 },
 //   { from: 2, to: 3, distance: 1.0 },
 // ]
+
+const targetPositions = new Float32Array([
+  0, 0, 0,
+  10, 0, 0,
+]);
+const sourcePositions = new Float32Array([
+  0, 0, 0,
+  1, 0, 0,
+  10, 0, 0,
+]);
+const crossNeighborGraph = createCrossNearbyGraph(targetPositions, sourcePositions, 10);
+// [
+//   { target: 0, source: 0, distance: 0 },
+//   { target: 0, source: 1, distance: 1 },
+//   { target: 1, source: 1, distance: 9 },
+//   { target: 1, source: 2, distance: 0 },
+// ]
 ```
 
 ---
@@ -54,6 +71,13 @@ Initializes the WASM module. **Must be called before using `createNearByGraph`.*
 - `positions`: Flat array of 3D coordinates (x, y, z, x, y, z, ...).
 - `distance`: Maximum distance to consider two points as neighbors.
 - Returns: An array of edges, where each edge contains `from` and `to` (indices of neighboring points) and `distance` (the distance between them).
+
+### `createCrossNearbyGraph(targetPositions: Float32Array, sourcePositions: Float32Array, distance: number): Array<{ target: number; source: number; distance: number }>`
+
+- `targetPositions`: Flat array of target 3D coordinates (x, y, z, x, y, z, ...).
+- `sourcePositions`: Flat array of source 3D coordinates (x, y, z, x, y, z, ...).
+- `distance`: Maximum distance to consider a source point near a target point.
+- Returns: An array of cross-set edges, where each edge contains `target`, `source`, and `distance`.
 
 ---
 

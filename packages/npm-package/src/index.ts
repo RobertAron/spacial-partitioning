@@ -25,4 +25,28 @@ function createNearByGraph(vec_tuples: Float32Array, distance: number) {
 	return result;
 }
 
-export { init, createNearByGraph };
+function createCrossNearbyGraph(
+	target_tuples: Float32Array,
+	source_tuples: Float32Array,
+	distance: number,
+) {
+	const rawResult = rustLibrary.create_cross_nearby_graph(
+		target_tuples,
+		source_tuples,
+		distance,
+	);
+	const result = new Array<{ target: number; source: number; distance: number }>();
+	for (let i = 0; i < rawResult.length; i += 3) {
+		const target = rawResult[i];
+		const source = rawResult[i + 1];
+		const distance = rawResult[i + 2];
+		result.push({
+			target,
+			source,
+			distance,
+		});
+	}
+	return result;
+}
+
+export { init, createCrossNearbyGraph, createNearByGraph };

@@ -78,3 +78,63 @@ pub fn create_nearby_graph(vec_tuples: &[f32], distance: f32) -> Vec<f32> {
 
     nearby_lookup
 }
+
+#[wasm_bindgen]
+pub fn create_cross_nearby_graph(target_tuples: &[f32], source_tuples: &[f32], distance: f32) -> Vec<f32> {
+    let targets: Vec<[f32; 3]> = target_tuples
+        .chunks_exact(3)
+        .map(|c| [c[0], c[1], c[2]])
+        .collect();
+    let sources: Vec<[f32; 3]> = source_tuples
+        .chunks_exact(3)
+        .map(|c| [c[0], c[1], c[2]])
+        .collect();
+    let squared_distance = distance * distance;
+    let mut nearby_lookup = Vec::new();
+
+    let mut bucketed_source_indexes: FxHashMap<u64, Vec<usize>> = FxHashMap::default();
+
+    for (i, &[x, y, z]) in sources.iter().enumerate() {
+        let bucket_id = pack_xyz_bits(
+            bucket_value(x, distance),
+            bucket_value(y, distance),
+            bucket_value(z, distance),
+        );
+        bucketed_source_indexes.entry(bucket_id).or_default().push(i);
+    }
+
+    let mut nearish_bucket: SmallVec<[usize; 64]> = SmallVec::new();
+    for (target_index, &[x, y, z]) in targets.iter().enumerate() {
+        nearish_bucket.clear();
+        let bx = bucket_value(x, distance);
+        let by = bucket_value(y, distance);
+        let bz = bucket_value(z, distance);
+
+        for dx in -1..=1 {
+            for dy in -1..=1 {
+                for dz in -1..=1 {
+                    let neighbor_key = pack_xyz_bits(bx + dx, by + dy, bz + dz);
+                    if let Some(neighbors) = bucketed_source_indexes.get(&neighbor_key) {
+                        nearish_bucket.extend(neighbors.iter().copied());
+                    }
+                }
+            }
+        }
+
+        for &source_index in nearish_bucket.iter() {
+            let [source_x, source_y, source_z] = sources[source_index];
+            let dx = source_x - x;
+            let dy = source_y - y;
+            let dz = source_z - z;
+            let dist_sq = dx * dx + dy * dy + dz * dz;
+            if dist_sq < squared_distance {
+                let actual_distance = dist_sq.sqrt();
+                nearby_lookup.push(target_index as f32);
+                nearby_lookup.push(source_index as f32);
+                nearby_lookup.push(actual_distance);
+            }
+        }
+    }
+
+    nearby_lookup
+}
